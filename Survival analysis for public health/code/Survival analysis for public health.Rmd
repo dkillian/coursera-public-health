@@ -1,0 +1,53 @@
+---
+title: "Survival analysis for public health"
+author: "Dan Killian"
+date: "1/1/2022"
+output: 
+  bookdown::html_document2:
+    number_sections: true
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    theme: paper
+    fig.caption: true
+    code_folding: hide
+    df_print: kable
+---
+
+```{r global_options, include=F, warning=F, message=F, echo=F, error=F}
+# standard figure size and generate clean output
+knitr::opts_chunk$set(fig.height=4, fig.width=6, warning=FALSE, message=FALSE, cache=TRUE, error=T, echo=T)
+
+library(here)
+
+#knitr::opts_knit$set(root.dir="~/South Sudan resilience - MSI") # doesn't seem to work
+
+source("../../../r prep.R")
+
+library(survival)
+
+dat <- read_csv("Survival analysis for public health/data/simulated HF mort data for GMPH (1K) final.csv")
+str(dat)
+```
+
+## data prep
+
+```{r}
+frq(dat$gender)
+describe(dat$fu_time)
+frq(dat$death)
+
+dat <- dat %>%
+    mutate(sex=factor(gender, labels=c("Male","Female"))) %>%
+    set_variable_labels(fu_time="Days since hospital admission")
+
+
+km_fit <- survfit(Surv(dat$fu_time, dat$death) ~ 1)
+km_fit
+
+```
+
+```{r}
+plot(km_fit)
+```
+
